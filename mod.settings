@@ -1,0 +1,17 @@
+name        = "CN Badges Fix"
+source_dir  = "source"
+output_dir  = "output"
+description = [=[currently work fine in CN server.
+
+How to use:
+change your mod badges directory to "ui/custombadges,load with this mod.
+
+Badges broken on server,trying to peek into the codes,
+and find out server/client enum output are different(or its just only in our server?)
+
+So I just done some code, avoid to mixing with built-in badges,also skip serverside badges enum to 128-255.
+]=]
+image       = "preview.jpg"
+tag_modtype = ""
+tag_support = "Must be run on Server"
+publish_id = 2707698282

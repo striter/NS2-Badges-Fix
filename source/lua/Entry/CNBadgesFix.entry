@@ -1,0 +1,4 @@
+modEntry = {
+    FileHooks = "lua/CNBadgesFix/FileHooks.lua",
+    Priority = 400
+}
