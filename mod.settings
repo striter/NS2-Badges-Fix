@@ -10,7 +10,8 @@ Badges broken on server,trying to peek into the codes,
 and find out server/client enum output are different(or its just only in our server?)
 
 So I just done some code, avoid to mixing with built-in badges,also skip serverside badges enum to 128-255.
-]=]
+
+git  https://github.com/striter/NS2-Badges-Fix]=]
 image       = "preview.jpg"
 tag_modtype = ""
 tag_support = "Must be run on Server"
