@@ -1,10 +1,13 @@
-name        = "CN Badges Fix"
+name        = "[CN] Server Booting (Badges/ModPanels)"
 source_dir  = "source"
 output_dir  = "output"
 description = [=[currently work fine in CN server.
+modpanels was rewrite from @Nin
 
-How to use:
+Badges:
 change your mod badges directory to "ui/custombadges,load with this mod.
+ModPanels:
+AddHintModPanel(material, url, hint)
 
 Badges broken on server,trying to peek into the codes,
 and find out server/client enum output are different(or its just only in our server?)
