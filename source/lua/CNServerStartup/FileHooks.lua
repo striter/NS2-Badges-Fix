@@ -21,3 +21,5 @@ ModLoader.SetupFileHook( "lua/ReadyRoomPlayer.lua", "lua/CNServerStartup/ReadyRo
 ModLoader.SetupFileHook( "lua/ServerAdminCommands.lua", "lua/CNServerStartup/ServerAdminCommands.lua", "post" )
 ModLoader.SetupFileHook( "lua/GUIWebView.lua", "lua/CNServerStartup/GUIWebView.lua", "replace" )
 ModLoader.SetupFileHook( "lua/Badges_Shared.lua", "lua/CNServerStartup/Badges_Shared.lua", "replace")
+ModLoader.SetupFileHook( "lua/Badges_Client.lua", "lua/CNServerStartup/Badges_Client.lua", "replace")
+ModLoader.SetupFileHook( "lua/GUIScoreboard.lua", "lua/CNServerStartup/GUIScoreboard.lua", "replace")
