@@ -1,4 +1,4 @@
-name        = "[CN] Server Booting (Badges/ModPanels/Cmds)"
+name        = "[CN] Server Booting (Badges/ModPanels/Cmds/Extensions)"
 source_dir  = "source"
 output_dir  = "output"
 description = [=[currently work fine in CN server.
@@ -14,6 +14,9 @@ AddHintModPanel(material, url, hint)
 Cmds:
 sv_redir ip
 will force all client connect that ip
+
+ShineExtensions:
+Add vote change server. (serverswitchvote) 
 
 Badges broken on server,trying to peek into the codes,
 and find out server/client enum output are different(or its just only in our server?)
