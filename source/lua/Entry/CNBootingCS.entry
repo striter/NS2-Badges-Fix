@@ -1,0 +1,4 @@
+modEntry = {
+    Client = "lua/CNServerStartup/Client.lua",
+    Priority = 1
+}

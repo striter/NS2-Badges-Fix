@@ -18,6 +18,10 @@ will force all client connect that ip
 ShineExtensions:
 Add vote change server. (serverswitchvote) 
 
+Vote Extensions:
+Add vote mute player(30s),require shine.basecommands
+Add vote force spectator.
+
 Badges broken on server,trying to peek into the codes,
 and find out server/client enum output are different(or its just only in our server?)
 
