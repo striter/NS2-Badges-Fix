@@ -25,7 +25,7 @@ if Client then
     local function SetupAdditionalVotes(voteMenu)
 
         AddVoteStartListener( "VoteSwitchServer", function( msg )
-            return string.format("SWITCH_SERVER_TO",msg.name)
+            return string.format(Locale.ResolveString("SWITCH_SERVER_TO"),msg.name)
         end )
 
         voteMenu:AddMainMenuOption(Locale.ResolveString("VOTE_MUTE_PLAYER"), GetPlayerList, function( msg )
