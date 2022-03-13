@@ -9,4 +9,7 @@ if kTranslateMessage then
 
     kTranslateMessage["VOTE_KILL_PLAYER"] = "击杀玩家"
     kTranslateMessage["VOTE_KILL_PLAYER_QUERY"] = "将<%s>强制击杀?"
+    
+    kTranslateMessage["VOTE_KILL_ALL"] = "击杀全体"
+    kTranslateMessage["VOTE_KILL_ALL_QUERY"] = "大家都不活辣?"
 end

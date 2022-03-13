@@ -3,6 +3,7 @@ RegisterVoteType( "VoteSwitchServer", { ip = "string (25)", name = "string(20)" 
 RegisterVoteType("VoteMutePlayer", { targetClient = "integer" })
 RegisterVoteType("VoteForceSpectator", { targetClient = "integer" })
 RegisterVoteType("VoteKillPlayer", { targetClient = "integer" })
+RegisterVoteType("VoteKillAll", { })
     
 if Client then
     local function GetPlayerList()
@@ -52,6 +53,15 @@ if Client then
         AddVoteStartListener("VoteKillPlayer", function(msg)
             return string.format(Locale.ResolveString("VOTE_KILL_PLAYER_QUERY"), Scoreboard_GetPlayerName(msg.targetClient))
         end)
+
+        
+        voteMenu:AddMainMenuOption(Locale.ResolveString("VOTE_KILL_ALL"),nil, function( msg )
+            AttemptToStartVote("VoteKillAll", {  })
+        end)
+
+        AddVoteStartListener("VoteKillAll", function(msg)
+            return Locale.ResolveString("VOTE_KILL_ALL_QUERY")
+        end)
     end
     AddVoteSetupCallback(SetupAdditionalVotes)
     
@@ -87,6 +97,12 @@ if Server then
 			if Player then
 				Player:Kill( nil, nil, Player:GetOrigin() )
 			end
+        end
+    end)
+
+    SetVoteSuccessfulCallback("VoteKillAll", 3, function( msg )
+        for _, player in ientitylist(Shared.GetEntitiesWithClassname("Player")) do
+            player:Kill(nil,nil,player:GetOrigin())
         end
     end)
 end
