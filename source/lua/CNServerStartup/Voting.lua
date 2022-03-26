@@ -3,6 +3,7 @@ RegisterVoteType( "VoteSwitchServer", { ip = "string (25)", name = "string(20)" 
 RegisterVoteType("VoteMutePlayer", { targetClient = "integer" })
 RegisterVoteType("VoteForceSpectator", { targetClient = "integer" })
 RegisterVoteType("VoteKillPlayer", { targetClient = "integer" })
+RegisterVoteType("VoteRankPlayer", { targetClient = "integer" })
 RegisterVoteType("VoteKillAll", { })
     
 if Client then
@@ -37,6 +38,14 @@ if Client then
             return string.format(Locale.ResolveString("VOTE_MUTE_PLAYER_QUERY"), Scoreboard_GetPlayerName(msg.targetClient))
         end)
 
+        voteMenu:AddMainMenuOption(Locale.ResolveString("VOTE_RANK_PLAYER"), GetPlayerList, function( msg )
+            AttemptToStartVote("VoteRankPlayer", { targetClient = msg.targetClient })
+        end)
+        
+        AddVoteStartListener("VoteRankPlayer", function(msg)
+            return string.format(Locale.ResolveString("VOTE_RANK_PLAYER_QUERY"), Scoreboard_GetPlayerName(msg.targetClient))
+        end)
+
         voteMenu:AddMainMenuOption(Locale.ResolveString("VOTE_FORCE_SPECTATE"), GetPlayerList, function( msg )
             AttemptToStartVote("VoteForceSpectator", { targetClient = msg.targetClient })
         end)
@@ -60,7 +69,8 @@ if Client then
         end)
 
         AddVoteStartListener("VoteKillAll", function(msg)
-            return Locale.ResolveString("VOTE_KILL_ALL_QUERY")
+            local random = math.random(1,5)
+            return Locale.ResolveString(string.format("VOTE_KILL_ALL_QUERY%i",random))
         end)
     end
     AddVoteSetupCallback(SetupAdditionalVotes)
@@ -68,39 +78,40 @@ if Client then
 end
 
 if Server then
-    SetVoteSuccessfulCallback( "VoteSwitchServer", 3, function( msg )
+    SetVoteSuccessfulCallback( "VoteSwitchServer", 1, function( msg )
         -- Shared.Message(msg.name .. " " .. msg.ip)
         Server.SendNetworkMessage("Redirect",{ ip = msg.ip }, true)
     end )
 
-    SetVoteSuccessfulCallback("VoteMutePlayer", 3, function( msg )
+    SetVoteSuccessfulCallback("VoteMutePlayer", 1, function( msg )
         local client = Server.GetClientById(msg.targetClient)
-        if client then
-            Shared.ConsoleCommand(string.format("sh_gag %s %s", client:GetUserId(), 30 * 60))
-        end
+        if not client then return end
+        Shared.ConsoleCommand(string.format("sh_gagid %s %s", client:GetUserId(), 30 * 60))
     end)
 
-    SetVoteSuccessfulCallback("VoteForceSpectator", 3, function( msg )
+    SetVoteSuccessfulCallback("VoteRankPlayer", 1, function( msg )
         local client = Server.GetClientById(msg.targetClient)
-        if client then
-			local Player = client:GetControllingPlayer()
-			if Player then
-                GetGamerules():JoinTeam( Player, kSpectatorIndex, true, true )
-            end
-        end
+        if not client then return end
+        Shared.ConsoleCommand(string.format("sh_rankidoffset %s %s", client:GetUserId(), 50))
     end)
 
-    SetVoteSuccessfulCallback("VoteKillPlayer", 3, function( msg )
+    SetVoteSuccessfulCallback("VoteForceSpectator", 1, function( msg )
         local client = Server.GetClientById(msg.targetClient)
-        if client then
-			local Player = client:GetControllingPlayer()
-			if Player then
-				Player:Kill( nil, nil, Player:GetOrigin() )
-			end
-        end
+        if not client then return end
+        local Player = client:GetControllingPlayer()
+        if not Player then return end
+        GetGamerules():JoinTeam( Player, kSpectatorIndex, true, true )
     end)
 
-    SetVoteSuccessfulCallback("VoteKillAll", 3, function( msg )
+    SetVoteSuccessfulCallback("VoteKillPlayer", 1, function( msg )
+        local client = Server.GetClientById(msg.targetClient)
+        if not client then return end
+        local Player = client:GetControllingPlayer()
+        if not Player then return end
+        Player:Kill( nil, nil, Player:GetOrigin() )
+    end)
+
+    SetVoteSuccessfulCallback("VoteKillAll", 1, function( msg )
         for _, player in ientitylist(Shared.GetEntitiesWithClassname("Player")) do
             player:Kill(nil,nil,player:GetOrigin())
         end

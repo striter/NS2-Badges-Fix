@@ -16,6 +16,7 @@ end
 
 ModLoader.SetupFileHook( "lua/NS2Gamerules.lua", "lua/CNServerStartup/NS2Gamerules.lua", "post" )
 ModLoader.SetupFileHook( "lua/Shared.lua", "lua/CNServerStartup/Shared.lua", "post" )
+ModLoader.SetupFileHook( "lua/Player.lua", "lua/CNServerStartup/Player.lua", "post" )
 ModLoader.SetupFileHook( "lua/Utility.lua", "lua/CNServerStartup/Utility.lua", "post" )
 ModLoader.SetupFileHook( "lua/ReadyRoomPlayer.lua", "lua/CNServerStartup/ReadyRoomPlayer.lua", "post" )
 ModLoader.SetupFileHook( "lua/ServerAdminCommands.lua", "lua/CNServerStartup/ServerAdminCommands.lua", "post" )

@@ -11,5 +11,12 @@ if kTranslateMessage then
     kTranslateMessage["VOTE_KILL_PLAYER_QUERY"] = "将<%s>强制击杀?"
     
     kTranslateMessage["VOTE_KILL_ALL"] = "击杀全体"
-    kTranslateMessage["VOTE_KILL_ALL_QUERY"] = "大家都不活辣?"
+    kTranslateMessage["VOTE_KILL_ALL_QUERY1"] = "大家都不活辣?"
+    kTranslateMessage["VOTE_KILL_ALL_QUERY2"] = "生活失意,我好难过."
+    kTranslateMessage["VOTE_KILL_ALL_QUERY3"] = "听说群友不来开黑啦?"
+    kTranslateMessage["VOTE_KILL_ALL_QUERY4"] = "你是红裤衩吗."
+    kTranslateMessage["VOTE_KILL_ALL_QUERY5"] = "媛 梓 氮."
+
+    kTranslateMessage["VOTE_RANK_PLAYER"] = "投票上分"
+    kTranslateMessage["VOTE_RANK_PLAYER_QUERY"] = "增加<%s>的社区校正分数?"
 end
