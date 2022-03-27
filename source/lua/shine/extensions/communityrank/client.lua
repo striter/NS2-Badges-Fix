@@ -34,7 +34,7 @@ Plugin.GUIScoreboardUpdateTeam = function(scoreboard, updateTeam)
                             if pie.clientId == clientIndex then
                                 
                                 local description = skillIcon.tooltipText
-                                description = description .. string.format("\n 段位分: %i \n NS2段位分: %i \n 社区校正: %i", pie.playerSkill,pie.hiveskill,pie.communityRank)
+                                description = description .. string.format("\n 段位分: %i\n NS2段位分: %i\n 社区校正分: %i\n\n NS2ID: %i", pie.playerSkill,pie.hiveskill,pie.communityRank,pie.steamId)
                                 scoreboard.badgeNameTooltip:SetText(description)
                                 break
                             end

@@ -40,18 +40,113 @@ local function SavePersistent(self)
     self:SaveConfig()
 end
 
+local function RankPlayerDelta(self,steamId,delta)
+    local rank = self.PlayerRanks[steamId]
+    if not rank then
+        rank = 0
+        self.PlayerRanks[steamId] = rank
+    end
+
+    rank = rank + delta
+
+    local target = Shine.GetClientByNS2ID(steamId)
+    if target then 
+        local player = target:GetControllingPlayer()
+        
+        rank = math.max(rank, -player.skill)
+        player:SetCommunityRank(rank)
+    end
+    
+    self.PlayerRanks[steamId] = rank
+end
+
 function Plugin:OnFirstThink()
     ReadPersistent(self)
-	Shine.Hook.SetupClassHook( "PlayerRanking", "EndGame", "OnEndGame", "PassivePost" )
-    -- local VRPlugin = Shine.Plugins["voterandom"]
-    -- if VRPlugin and VRPlugin.Enabled then
-    --     local baseGetHiveSkill = VRPlugin.SkillGetters.GetHiveSkill
-    --     VRPlugin.SkillGetters.GetHiveSkill =  function( Ply, TeamNumber, TeamSkillEnabled, CommanderSkillEnabled, Options )
-    --         local hiveSkill =  baseGetHiveSkill( Ply, TeamNumber, TeamSkillEnabled, CommanderSkillEnabled, Options)
-    --         Shared.Message(tostring(hiveSkill))
-    --         return hiveSkill
-    --     end
-    -- end
+
+    function Plugin:OnEndGame(_winningTeam)
+        local gameMode = Shine.GetGamemode()
+        
+        local data = CHUDGetLastRoundStats();
+        if not data then
+            Shared.Message("[CNCR] ERROR Option 'savestats' not enabled ")
+            return
+        end
+        
+        local winningTeam = data.RoundInfo.winningTeam
+        local gameLength = data.RoundInfo.roundLength
+
+        local team1Table = {}
+        local team2Table = {}
+        local function PopTeamEntry(_teamTable,_steamId,_teamEntry)
+            if not _teamEntry.timePlayed or _teamEntry.timePlayed <=0 then return end 
+            table.insert(_teamTable, {steamId = _steamId,gameTime = _teamEntry.timePlayed ,score = _teamEntry.score })
+            -- Shared.Message(string.format("%i %i %i",_steamId,_teamEntry.timePlayed,_teamEntry.score))
+        end
+
+        local playerCount = 0
+        for steamId , playerStat in pairs( data.PlayerStats ) do
+            PopTeamEntry(team1Table,steamId,playerStat[1])
+            PopTeamEntry(team2Table,steamId,playerStat[2])
+            playerCount = playerCount + 1
+        end
+        
+        Shared.Message(string.format("[CNCR] End Game Resulting|Mode:%s Length:%i Players:%i WinTeam: %s|", gameMode , gameLength,playerCount , winningTeam))
+        -- if (gameMode ~= "ns2" and gameMode ~= "ns2large") or gameLength < 600 or playerCount < 12 then
+        --     Shared.Message(string.format("[CNCR] End Game Restricted"))
+        --     return
+        -- end
+
+        local function RankCompare(a,b) return a.score > b.score end
+        table.sort(team1Table,RankCompare)
+        table.sort(team2Table,RankCompare)
+        
+        local function ApplyRankTable(rankTable,teamTable,rankStart,rankEnd,gameLength)
+            local size = #teamTable
+            for index,data in ipairs(teamTable) do
+                local steamId = data.steamId
+                if not rankTable[steamId] then
+                    rankTable[steamId] = 0
+                end
+
+                local timeParam = data.gameTime / gameLength
+                local indexParam = (index - 1) / math.max(1,( size - 1 )) -- 1 to size
+                local baseScore = rankStart + (rankEnd - rankStart)*indexParam
+                rankTable[steamId] = rankTable[steamId] +  math.floor(baseScore * timeParam)
+                Shared.Message(string.format("ID:%s I:%.2f T:%.2f BS:%i F:%i",steamId,indexParam,timeParam,baseScore,rankTable[steamId]))
+            end
+        end
+        local rankTable = {}
+        local rankScoreStatus = {}
+        rankScoreStatus[-1] = { eloStart = -0 , eloEnd = -80 }
+        rankScoreStatus[0] = { eloStart = 0 , eloEnd = 20 }
+        rankScoreStatus[1] = { eloStart = 80 , eloEnd = 20 }
+
+        local team1Status,team2Status
+        if winningTeam == kMarineTeamType then
+            team1Status = 1; team2Status = -1;
+        elseif winningTeam == kAlienTeamType then
+            team1Status = -1; team2Status = 1;
+        else
+            team1Status = 0; team2Status = 0;
+        end
+
+        Shared.Message("[CNCR] Team 1")
+        ApplyRankTable(rankTable,team1Table,rankScoreStatus[team1Status].eloStart,rankScoreStatus[team1Status].eloEnd,gameLength)
+        Shared.Message("[CNCR] Team 2")
+        ApplyRankTable(rankTable,team2Table,rankScoreStatus[team2Status].eloStart,rankScoreStatus[team2Status].eloEnd,gameLength)
+
+        Shared.Message("[CNCR] Result")
+
+        for steamId, rankOffset in pairs(rankTable) do
+            if rankOffset ~= 0 then
+                RankPlayerDelta(self,steamId,rankOffset)
+            end
+            Shared.Message(string.format("%i|%d",steamId, rankOffset))
+        end
+
+        SavePersistent(self)
+    end
+    Shine.Hook.SetupClassHook("NS2Gamerules", "EndGame", "OnEndGame", "PassivePost")
 end
 
 function Plugin:ResetState()
@@ -60,12 +155,12 @@ function Plugin:ResetState()
 end
 
 function Plugin:Cleanup()
-	self:ResetState()
+    table.empty(self.PlayerRanks)
     return true
 end
 
 function Plugin:CreateMessageCommands()
-    local function RankPlayer( _client, _id, _rank )
+    local function AdminRankPlayer( _client, _id, _rank )
         local target = Shine.GetClientByNS2ID(_id)
         if not target then 
             return 
@@ -78,28 +173,22 @@ function Plugin:CreateMessageCommands()
         SavePersistent(self)
     end
 
-    local GagCommand = self:BindCommand( "sh_rankid", "rankid", RankPlayer )
+    local GagCommand = self:BindCommand( "sh_rank", "rank", AdminRankPlayer )
     GagCommand:AddParam{ Type = "steamid" }
     GagCommand:AddParam{ Type = "number", Round = true, Min = -5000, Max = 5000, Optional = true, Default = 0 }
     GagCommand:Help( "设置ID对应玩家的社区段位." )
 
-    local function RankPlayerOffset( _client, _id, _offset )
+    local function AdminRankPlayerDelta( _client, _id, _offset )
         local target = Shine.GetClientByNS2ID(_id)
         if not target then 
             return 
         end
 
-        if not self.PlayerRanks[_id] then
-            self.PlayerRanks[_id] =0
-        end
-        local rankOffseted = self.PlayerRanks[_id] + _offset
-        self.PlayerRanks[_id] = rankOffseted
-        target:GetControllingPlayer():SetCommunityRank(rankOffseted)
-
+        RankPlayerDelta(self,_id,_offset)
         Shine:AdminPrint( nil, "%s set %s rank to %s", true,  Shine.GetClientInfo( _client ), _id, rankOffseted )
         SavePersistent(self)
     end
-    local GagCommand = self:BindCommand( "sh_rankidoffset", "rankidoffset", RankPlayerOffset )
+    local GagCommand = self:BindCommand( "sh_rankdelta", "rankdelta", AdminRankPlayerDelta )
     GagCommand:AddParam{ Type = "steamid" }
     GagCommand:AddParam{ Type = "number", Round = true, Min = -5000, Max = 5000, Optional = true, Default = 0 }
     GagCommand:Help( "增减ID对应玩家的社区段位." )
@@ -111,6 +200,7 @@ end
 
 function Plugin:ClientConnect( _client )
     local clientID = _client:GetUserId()
+    if clientID == 0 then return end
     if not self.PlayerRanks[clientID] then
         self.PlayerRanks[clientID] = 0
     end
