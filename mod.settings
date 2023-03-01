@@ -1,32 +1,7 @@
-name        = "[CN] Server Booting (Badges/ModPanels/Cmds/Extensions)"
+name        = "[CN] Community ART Resources"
 source_dir  = "source"
 output_dir  = "output"
-description = [=[currently work fine in CN server.
-modpanels was rewrite from @Nin
-
-Badges:
-change your mod badges directory to "ui/custombadges,load with this mod.
-besides, 10th badges will show on the left side of skillicon, likely to fill it with some toy icons
-
-ModPanels:
-AddHintModPanel(material, url, hint)
-
-Cmds:
-sv_redir ip
-will force all client connect that ip
-
-ShineExtensions:
-Add vote change server. (serverswitchvote) 
-
-Vote Extensions:
-Add vote mute player(30s),require shine.basecommands
-Add vote force spectator.
-
-Badges broken on server,trying to peek into the codes,
-and find out server/client enum output are different(or its just only in our server?)
-
-So I just done some code, avoid to mixing with built-in badges,also skip serverside badges enum to 128-255.
-
+description = [=[Badges modpanel emblem(static/dynamic) etc
 git  https://github.com/striter/NS2-Badges-Fix]=]
 image       = "preview.jpg"
 tag_modtype = ""

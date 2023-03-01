@@ -4,7 +4,9 @@
 --- DateTime: 2023/2/28 15:30
 ---
 
-Script.Load("lua/CNArtRes/BadgeLocale.lua")
+if Client then
+    Script.Load("lua/CNArtRes/BadgeLocale.lua")
+end
 
 if AddHintModPanel then
     math.randomseed(tostring(os.time()):reverse():sub(1, 6))
