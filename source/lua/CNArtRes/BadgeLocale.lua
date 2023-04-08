@@ -65,4 +65,7 @@ kLocales["KCCTV5"]="CCTV 5 - 动物世界"
 kLocales["KLuo"]="萝萝萝萝萝萝萝萝萝萝萝萝萝萝萝萝"
 kLocales["KBei"]="北北北北北北北北北北北北北北北北"
 
-
+-- NSL Badges
+kLocales["NSL2023G"] = "2023年NS社区赛 - 团队指挥"
+kLocales["NSL2023S"] = "2023年NS社区赛 - 主力队员"
+kLocales["NSL2023B"] = "2023年NS社区赛 - 最佳后勤"
