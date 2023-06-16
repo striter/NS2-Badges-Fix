@@ -1,3 +1,5 @@
+if not kLocales then return end
+
 kLocales["T0EmoBegging"]="Emo了"
 kLocales["T0EmoBlink"]="Emo了"
 kLocales["T0EmoCrazyLove"]="Emo了"
